@@ -356,6 +356,10 @@ export default App;
 | onLikeReply      | `function`                     | Callback when reply is liked                              |
 | onClickShare     | `function`                     | Callback when share button is clicked                     |
 
+### Demo Output
+
+![Demo React-newsfeed Package](https://img001.prntscr.com/file/img001/loMk2UCKREqFcrBKCR9tRw.png "Demo React-newsfeed Package")
+
 ### Dependencies
 
     React
