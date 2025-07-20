@@ -8,6 +8,8 @@ A customizable social media post component for React applications that mimics po
 - [Linkedin](https://linkedin.com/in/abhishekgiri49)
 - [Portfolio](https://giriabhishek.com.np)
 
+[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/devbox/l8xtfx?embed=1)
+
 ## Features
 
     📝 Social media post component with author info, content, and tags
