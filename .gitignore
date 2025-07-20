@@ -1,0 +1,64 @@
+# General
+.DS_Store
+*.log
+*.env
+.env.local
+.env.development
+.env.test
+.env.production
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dependency directories
+node_modules/
+demo/node_modules/
+
+# Build directories
+dist/
+build/
+demo/dist/
+demo/build/
+
+# Cache directories
+.npm
+.yarn
+.yarn-cache
+demo/.npm
+demo/.yarn
+demo/.yarn-cache
+
+# Package manager files
+package-lock.json
+yarn.lock
+demo/package-lock.json
+demo/yarn.lock
+
+# React/Vite specific
+.cache/
+demo/.cache/
+*.tsbuildinfo
+demo/*.tsbuildinfo
+
+# Testing
+coverage/
+demo/coverage/
+.nyc_output
+demo/.nyc_output
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+demo/npm-debug.log*
+demo/yarn-debug.log*
+demo/yarn-error.log*
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
