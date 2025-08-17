@@ -11,6 +11,7 @@ export default function Post({
   content,
   tags = [],
   images = [],
+  extraComponent,
   options,
   initialLiked = false,
   initialLikeCount = 0,
@@ -249,7 +250,11 @@ export default function Post({
   };
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <PostHeader author={author} options={options} />
+      <PostHeader
+        author={author}
+        options={options}
+        extraComponent={extraComponent}
+      />
 
       <PostContent
         content={content}
