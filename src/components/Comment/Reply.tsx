@@ -3,7 +3,7 @@ import Avatar from "./../Shared/Avatar";
 import LikeButton from "./../Shared/LikeButton";
 import TimeStamp from "./../Shared/TimeStamp";
 
-export default function Reply({ reply, onLike }: ReplyProps) {
+export default function Reply({ reply, onLike, onDelete }: ReplyProps) {
   return (
     <div className="flex space-x-2">
       <Avatar src={reply.avatar} alt={reply.author} size="sm" />
@@ -20,6 +20,11 @@ export default function Reply({ reply, onLike }: ReplyProps) {
             count={reply.likes}
             onClick={onLike}
           />
+          {(reply.canDelete ?? false) && (
+            <button onClick={onDelete} className="hover:underline">
+              Delete
+            </button>
+          )}
           <TimeStamp time={reply.timestamp} />
         </div>
       </div>

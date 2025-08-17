@@ -3,6 +3,7 @@ export interface Reply {
   author: string;
   avatar: string;
   content: string;
+  canDelete?: boolean;
   timestamp: string;
   likes: number;
   liked: boolean;
@@ -20,6 +21,7 @@ export interface Comment {
   timestamp: string;
   likes: number;
   liked: boolean;
+  canDelete?: boolean;
   replies: Reply[];
   showReplies: boolean;
   showReplyInput: boolean;
@@ -29,6 +31,7 @@ export interface PostImage {
   id: string;
   url: string;
   alt: string;
+  type?: "image" | "video" | "youtube";
 }
 export interface Author {
   name: string;
@@ -48,15 +51,19 @@ export interface PostProps {
   onLikePost?: (liked: boolean) => void;
   onAddComment?: (content: string) => Comment | void;
   onLikeComment?: (commentId: string) => void;
+  onDeleteComment?: (commentId: string) => void;
   onAddReply?: (commentId: string, content: string) => Reply | void;
   onLikeReply?: (commentId: string, replyId: string) => void;
+  onDeleteReply?: (commentId: string, replyId: string) => void;
   onClickShare?: () => void;
 }
 
 export interface CommentProps {
   comment: Comment;
   onLike: () => void;
+  onDelete: () => void;
   onLikeReply: (replyId: string) => void;
+  onDeleteReply: (replyId: string) => void;
   onToggleReplies: () => void;
   onToggleReplyInput: () => void;
   onPostReply: (content: string) => void;
@@ -72,4 +79,5 @@ export interface CommentInputProps {
 export interface ReplyProps {
   reply: Reply;
   onLike: () => void;
+  onDelete: () => void;
 }

@@ -8,7 +8,9 @@ interface PostCommentsProps {
   onCommentChange: (value: string) => void;
   onPostComment: () => void;
   onLikeComment: (commentId: string) => void;
+  onDeleteComment: (commentId: string) => void;
   onLikeReply: (commentId: string, replyId: string) => void;
+  onDeleteReply: (commentId: string, replyId: string) => void;
   onToggleReplies: (commentId: string) => void;
   onToggleReplyInput: (commentId: string) => void;
   onPostReply: (commentId: string, content: string) => void;
@@ -20,7 +22,9 @@ export default function PostComments({
   onCommentChange,
   onPostComment,
   onLikeComment,
+  onDeleteComment,
   onLikeReply,
+  onDeleteReply,
   onToggleReplies,
   onToggleReplyInput,
   onPostReply,
@@ -37,7 +41,9 @@ export default function PostComments({
       <CommentList
         comments={comments}
         onLikeComment={onLikeComment}
+        onDeleteComment={onDeleteComment}
         onLikeReply={onLikeReply}
+        onDeleteReply={onDeleteReply}
         onToggleReplies={onToggleReplies}
         onToggleReplyInput={onToggleReplyInput}
         onPostReply={onPostReply}

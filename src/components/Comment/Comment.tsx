@@ -8,7 +8,9 @@ import TimeStamp from "../Shared/TimeStamp";
 export default function Comment({
   comment,
   onLike,
+  onDelete,
   onLikeReply,
+  onDeleteReply,
   onToggleReplies,
   onToggleReplyInput,
   onPostReply,
@@ -52,6 +54,11 @@ export default function Comment({
             <button onClick={onToggleReplyInput} className="hover:underline">
               Reply
             </button>
+            {(comment.canDelete ?? false) && (
+              <button onClick={onDelete} className="hover:underline">
+                Delete
+              </button>
+            )}
             <TimeStamp time={comment.timestamp} />
           </div>
 
@@ -70,6 +77,7 @@ export default function Comment({
               showReplies={comment.showReplies}
               onToggleReplies={onToggleReplies}
               onLikeReply={onLikeReply}
+              onDeleteReply={onDeleteReply}
             />
           )}
         </div>

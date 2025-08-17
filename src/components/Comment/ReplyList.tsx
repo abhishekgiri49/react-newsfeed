@@ -7,6 +7,7 @@ interface ReplyListProps {
   showReplies: boolean;
   onToggleReplies: () => void;
   onLikeReply: (replyId: string) => void;
+  onDeleteReply: (replyId: string) => void;
 }
 
 export default function ReplyList({
@@ -14,6 +15,7 @@ export default function ReplyList({
   showReplies,
   onToggleReplies,
   onLikeReply,
+  onDeleteReply,
 }: ReplyListProps) {
   return (
     <div className="mt-2">
@@ -34,6 +36,7 @@ export default function ReplyList({
               key={reply.id}
               reply={reply}
               onLike={() => onLikeReply(reply.id)}
+              onDelete={() => onDeleteReply(reply.id)}
             />
           ))}
         </div>
