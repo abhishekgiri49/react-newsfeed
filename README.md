@@ -49,6 +49,7 @@ interface PostData {
     id: string;
     url: string;
     alt: string;
+    type?: "image" | "video" | "youtube";
   }>;
   liked: boolean;
   likeCount: number;
@@ -60,6 +61,7 @@ interface PostData {
     timestamp: string;
     likes: number;
     liked: boolean;
+    canDelete?: boolean;
     replies: any[];
     showReplies: boolean;
     showReplyInput: boolean;
@@ -83,11 +85,13 @@ function App() {
           id: "1",
           url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           alt: "Image 1",
+          type: "image",
         },
         {
           id: "2",
           url: "https://plus.unsplash.com/premium_photo-1675882505334-382d4cb3d718?q=80&w=1165&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           alt: "Image 2",
+          type: "image",
         },
       ],
       liked: false,
@@ -101,6 +105,7 @@ function App() {
           timestamp: "2h",
           likes: 5,
           liked: false,
+
           replies: [],
           showReplies: false,
           showReplyInput: false,
@@ -123,10 +128,89 @@ function App() {
           id: "1",
           url: "https://images.unsplash.com/photo-1548347480-50e99d864837?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           alt: "Nature shot",
+          type: "image",
         },
       ],
       liked: true,
       likeCount: 89,
+      comments: [],
+    },
+    // Example with video
+    {
+      id: "3",
+      author: {
+        name: "Video Creator",
+        avatar: "https://img.icons8.com/color/48/user-male-circle--v5.png",
+        timeAgo: "1h",
+      },
+      content: "Check out this amazing video!",
+      tags: ["video", "content"],
+      images: [
+        {
+          id: "1",
+          url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Sample video URL
+          alt: "Sample video",
+          type: "video",
+        },
+      ],
+      liked: false,
+      likeCount: 45,
+      comments: [],
+    },
+    // Example with YouTube video
+    {
+      id: "4",
+      author: {
+        name: "YouTube Content",
+        avatar: "https://img.icons8.com/color/48/user-male-circle--v5.png",
+        timeAgo: "3h",
+      },
+      content: "Amazing YouTube video!",
+      tags: ["youtube", "video"],
+      images: [
+        {
+          id: "1",
+          url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Example YouTube URL
+          alt: "YouTube video",
+          type: "youtube",
+        },
+      ],
+      liked: false,
+      likeCount: 67,
+      comments: [],
+    },
+    // Example with mixed media types
+    {
+      id: "5",
+      author: {
+        name: "Mixed Media",
+        avatar: "https://img.icons8.com/color/48/user-male-circle--v5.png",
+        timeAgo: "6h",
+      },
+      content: "Mixed media post with image, video, and YouTube!",
+      tags: ["mixed", "media"],
+      images: [
+        {
+          id: "1",
+          url: "https://images.unsplash.com/photo-1548347480-50e99d864837?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          alt: "Image",
+          type: "image",
+        },
+        {
+          id: "2",
+          url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          alt: "Video",
+          type: "video",
+        },
+        {
+          id: "3",
+          url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          alt: "YouTube",
+          type: "youtube",
+        },
+      ],
+      liked: true,
+      likeCount: 156,
       comments: [],
     },
   ]);
@@ -154,6 +238,7 @@ function App() {
       timestamp: "Just now",
       likes: 0,
       liked: false,
+      canDelete: true,
       replies: [],
       showReplies: false,
       showReplyInput: false,
@@ -194,6 +279,20 @@ function App() {
       )
     );
   };
+  const handleDeleteComment = (postId: string, commentId: string) => {
+    setPosts(
+      posts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              comments: post.comments.filter(
+                (comment) => comment.id !== commentId
+              ),
+            }
+          : post
+      )
+    );
+  };
 
   const handleAddReply = (
     postId: string,
@@ -206,6 +305,7 @@ function App() {
       avatar: "https://img.icons8.com/color/48/user-male-circle--v5.png",
       content,
       timestamp: "Just now",
+      canDelete: true,
       likes: 0,
       liked: false,
     };
@@ -265,6 +365,32 @@ function App() {
       )
     );
   };
+  const handleDeleteReply = (
+    postId: string,
+    commentId: string,
+    replyId: string
+  ) => {
+    setPosts(
+      posts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              comments: post.comments.map((comment) =>
+                comment.id === commentId
+                  ? {
+                      ...comment,
+                      replies: comment.replies.filter(
+                        (reply) => reply.id !== replyId
+                      ),
+                    }
+                  : comment
+              ),
+            }
+          : post
+      )
+    );
+  };
+
   const handleShareClick = (postId: string) => {
     const postToShare = posts.find((post) => post.id === postId);
 
@@ -321,11 +447,17 @@ function App() {
           onLikePost={(liked) => handleLikePost(post.id, liked)}
           onAddComment={(content) => handleAddComment(post.id, content)}
           onLikeComment={(commentId) => handleLikeComment(post.id, commentId)}
+          onDeleteComment={(commentId) =>
+            handleDeleteComment(post.id, commentId)
+          }
           onAddReply={(commentId, content) =>
             handleAddReply(post.id, commentId, content)
           }
           onLikeReply={(commentId, replyId) =>
             handleLikeReply(post.id, commentId, replyId)
+          }
+          onDeleteReply={(commentId, replyId) =>
+            handleDeleteReply(post.id, commentId, replyId)
           }
           onClickShare={() => handleShareClick(post.id)}
         />
@@ -335,9 +467,12 @@ function App() {
 }
 
 export default App;
+
 ```
 
 ### Props
+
+images | `Array<{id, url, alt,type}>` | Array of images to display?: "image" | "video" | "youtube";
 
 ## Props
 
@@ -346,7 +481,7 @@ export default App;
 | author           | `object`                       | Author information (contains `name`, `avatar`, `timeAgo`) |
 | content          | `string`                       | Post content text                                         |
 | tags             | `string[]`                     | Array of tags                                             |
-| images           | `Array<{id, url, alt}>`        | Array of images to display                                |
+| images           | `Array<{id, url, alt,type}>`   | Array of images to display                                |
 | options          | `Array<{title, action, icon}>` | Array of options for the post menu                        |
 | initialLiked     | `boolean`                      | Initial liked state                                       |
 | initialLikeCount | `number`                       | Initial like count                                        |
@@ -354,8 +489,10 @@ export default App;
 | onLikePost       | `function`                     | Callback when post is liked/unliked                       |
 | onAddComment     | `function`                     | Callback when comment is added                            |
 | onLikeComment    | `function`                     | Callback when comment is liked                            |
+| onDeleteComment  | `function`                     | Callback when comment delete button is pressed            |
 | onAddReply       | `function`                     | Callback when reply is added                              |
 | onLikeReply      | `function`                     | Callback when reply is liked                              |
+| onDeleteReply    | `function`                     | Callback when reply is deleted                            |
 | onClickShare     | `function`                     | Callback when share button is clicked                     |
 
 ### Demo Output

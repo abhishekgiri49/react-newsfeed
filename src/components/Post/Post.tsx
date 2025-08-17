@@ -19,8 +19,10 @@ export default function Post({
   onLikePost,
   onAddComment,
   onLikeComment,
+  onDeleteComment,
   onAddReply,
   onLikeReply,
+  onDeleteReply,
   onClickShare,
 }: PostProps) {
   const [liked, setLiked] = useState(initialLiked);
@@ -75,6 +77,27 @@ export default function Post({
       );
     }
   };
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      // Save the current state for possible revert
+      const previousComments = [...comments];
+
+      // Optimistically remove the comment
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment.id !== commentId)
+      );
+
+      // Call API to delete comment (if `onDeleteComment` is provided)
+      if (onDeleteComment) {
+        await onDeleteComment(commentId);
+      }
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+      const previousComments = [...comments];
+      // Revert optimistic deletion if API fails
+      setComments((prevComments) => [...prevComments, ...previousComments]);
+    }
+  };
 
   const handleLikeReply = async (commentId: string, replyId: string) => {
     try {
@@ -126,6 +149,45 @@ export default function Post({
       );
     }
   };
+  const handleDeleteReply = async (commentId: string, replyId: string) => {
+    let previousReplies: any[] = [];
+    try {
+      // Keep a copy of the current state (for revert if API fails)
+
+      setComments((prevComments) =>
+        prevComments.map((comment) => {
+          if (comment.id === commentId) {
+            previousReplies = comment.replies; // save before filtering
+            return {
+              ...comment,
+              replies: comment.replies.filter((reply) => reply.id !== replyId),
+            };
+          }
+          return comment;
+        })
+      );
+
+      // Call API if provided
+      if (onDeleteReply) {
+        await onDeleteReply(commentId, replyId);
+      }
+    } catch (error) {
+      console.error("Failed to delete reply:", error);
+
+      // Revert on error
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                replies: previousReplies, // restore previous replies
+              }
+            : comment
+        )
+      );
+    }
+  };
+
   const handlePostReply = async (commentId: string, replyContent: string) => {
     // Early return if content is empty or callback doesn't exist
     if (!replyContent.trim() || !onAddReply) return;
@@ -213,7 +275,9 @@ export default function Post({
           onCommentChange={setNewComment}
           onPostComment={handlePostComment}
           onLikeComment={handleLikeComment}
+          onDeleteComment={handleDeleteComment}
           onLikeReply={handleLikeReply}
+          onDeleteReply={handleDeleteReply}
           onToggleReplies={toggleReplies}
           onToggleReplyInput={toggleReplyInput}
           onPostReply={handlePostReply}
