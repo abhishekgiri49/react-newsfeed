@@ -2,6 +2,7 @@ import "./App.css";
 import { Post } from "react-newsfeed";
 import { useState } from "react";
 import { BookmarkCheck, Bug, Share } from "lucide-react";
+import ApplyFollowRow from "./ApplyFollowRow";
 
 interface PostData {
   id: string;
@@ -390,6 +391,18 @@ function App() {
           author={post.author}
           content={post.content}
           tags={post.tags}
+          extraComponent={
+            <ApplyFollowRow
+              onQuickApply={async () => {
+                // call your API here
+                // await fetch("/api/apply", { method: "POST", body: ... });
+              }}
+              onFollow={async (isFollowing) => {
+                // call your API to follow/unfollow
+                // await fetch(`/api/follow?follow=${isFollowing}`, { method: "POST" });
+              }}
+            />
+          }
           options={[
             {
               title: "Share",

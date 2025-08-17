@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface Reply {
   id: string;
   author: string;
@@ -44,6 +46,7 @@ export interface PostProps {
   tags?: string[];
   options?: DropdownOption[];
   images?: PostImage[];
+  extraComponent?: ReactNode;
   initialLiked?: boolean;
   initialLikeCount?: number;
   initialComments?: Comment[];

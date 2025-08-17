@@ -35,6 +35,7 @@ import "./App.css";
 import { Post } from "react-newsfeed";
 import { useState } from "react";
 import { BookmarkCheck, Bug, Share } from "lucide-react";
+import ApplyFollowRow from "./ApplyFollowRow";
 
 interface PostData {
   id: string;
@@ -423,6 +424,18 @@ function App() {
           author={post.author}
           content={post.content}
           tags={post.tags}
+          extraComponent={
+            <ApplyFollowRow
+              onQuickApply={async () => {
+                // call your API here
+                // await fetch("/api/apply", { method: "POST", body: ... });
+              }}
+              onFollow={async (isFollowing) => {
+                // call your API to follow/unfollow
+                // await fetch(`/api/follow?follow=${isFollowing}`, { method: "POST" });
+              }}
+            />
+          }
           options={[
             {
               title: "Share",
@@ -468,6 +481,7 @@ function App() {
 
 export default App;
 
+
 ```
 
 ### Props
@@ -481,6 +495,7 @@ images | `Array<{id, url, alt,type}>` | Array of images to display?: "image" | "
 | author           | `object`                       | Author information (contains `name`, `avatar`, `timeAgo`) |
 | content          | `string`                       | Post content text                                         |
 | tags             | `string[]`                     | Array of tags                                             |
+| extraComponent   | `ReactNode Component`          | ReactNode Component                                       |
 | images           | `Array<{id, url, alt,type}>`   | Array of images to display                                |
 | options          | `Array<{title, action, icon}>` | Array of options for the post menu                        |
 | initialLiked     | `boolean`                      | Initial liked state                                       |
