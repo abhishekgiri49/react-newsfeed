@@ -30,6 +30,7 @@ interface PostData {
     likes: number;
     liked: boolean;
     canDelete?: boolean;
+    canReply?: boolean;
     replies: any[];
     showReplies: boolean;
     showReplyInput: boolean;

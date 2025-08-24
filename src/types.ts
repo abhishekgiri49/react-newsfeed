@@ -24,6 +24,7 @@ export interface Comment {
   likes: number;
   liked: boolean;
   canDelete?: boolean;
+  canReply?: boolean;
   replies: Reply[];
   showReplies: boolean;
   showReplyInput: boolean;
