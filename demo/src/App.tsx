@@ -208,6 +208,7 @@ function App() {
       likes: 0,
       liked: false,
       canDelete: true,
+      canReply: true,
       replies: [],
       showReplies: false,
       showReplyInput: false,
