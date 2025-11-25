@@ -51,9 +51,11 @@ export default function Comment({
             >
               Like
             </button>
-            <button onClick={onToggleReplyInput} className="hover:underline">
-              Reply
-            </button>
+            {(comment.canReply ?? false) && (
+              <button onClick={onToggleReplyInput} className="hover:underline">
+                Reply
+              </button>
+            )}
             {(comment.canDelete ?? false) && (
               <button onClick={onDelete} className="hover:underline">
                 Delete
