@@ -31,6 +31,7 @@ interface PostData {
     liked: boolean;
     canDelete?: boolean;
     canReply?: boolean;
+    canLike?: boolean;
     replies: any[];
     showReplies: boolean;
     showReplyInput: boolean;
@@ -74,7 +75,9 @@ function App() {
           timestamp: "2h",
           likes: 5,
           liked: false,
-
+          canDelete: false,
+          canReply: true,
+          canLike: false,
           replies: [],
           showReplies: false,
           showReplyInput: false,

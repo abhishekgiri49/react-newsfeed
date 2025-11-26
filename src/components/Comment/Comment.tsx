@@ -37,20 +37,24 @@ export default function Comment({
           </div>
 
           <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
-            {comment.likes > 0 && (
-              <span className="flex items-center space-x-1">
-                <span>👍</span>
-                <span>{comment.likes}</span>
-              </span>
+            {(comment.canLike ?? false) && (
+              <>
+                {comment.likes > 0 && (
+                  <span className="flex items-center space-x-1">
+                    <span>👍</span>
+                    <span>{comment.likes}</span>
+                  </span>
+                )}
+                <button
+                  onClick={onLike}
+                  className={`hover:underline ${
+                    comment.liked ? "text-blue-600 font-semibold" : ""
+                  }`}
+                >
+                  Like
+                </button>
+              </>
             )}
-            <button
-              onClick={onLike}
-              className={`hover:underline ${
-                comment.liked ? "text-blue-600 font-semibold" : ""
-              }`}
-            >
-              Like
-            </button>
             {(comment.canReply ?? false) && (
               <button onClick={onToggleReplyInput} className="hover:underline">
                 Reply

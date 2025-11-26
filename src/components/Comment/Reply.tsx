@@ -15,11 +15,13 @@ export default function Reply({ reply, onLike, onDelete }: ReplyProps) {
           <p className="text-xs text-gray-800 mt-1">{reply.content}</p>
         </div>
         <div className="flex items-center space-x-3 mt-1 text-xs text-gray-500">
-          <LikeButton
-            liked={reply.liked}
-            count={reply.likes}
-            onClick={onLike}
-          />
+          {(reply.canLike ?? false) && (
+            <LikeButton
+              liked={reply.liked}
+              count={reply.likes}
+              onClick={onLike}
+            />
+          )}
           {(reply.canDelete ?? false) && (
             <button onClick={onDelete} className="hover:underline">
               Delete

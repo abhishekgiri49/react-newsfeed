@@ -6,6 +6,7 @@ export interface Reply {
   avatar: string;
   content: string;
   canDelete?: boolean;
+  canLike?: boolean;
   timestamp: string;
   likes: number;
   liked: boolean;
@@ -25,6 +26,7 @@ export interface Comment {
   liked: boolean;
   canDelete?: boolean;
   canReply?: boolean;
+  canLike?: boolean;
   replies: Reply[];
   showReplies: boolean;
   showReplyInput: boolean;
