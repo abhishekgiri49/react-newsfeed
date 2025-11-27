@@ -328,11 +328,13 @@ export default function PostImages({ images }: PostImagesProps) {
       }
     }
 
-    // Default to image
+    // Default to image - use thumbnail if available, otherwise use url
+    const imageSrc = media.thumbnail || media.url || "/placeholder.svg";
+
     return (
       <img
         key={media.id}
-        src={media.url || "/placeholder.svg"}
+        src={imageSrc}
         alt={media.alt}
         className={`${baseClassName} object-cover`}
         onClick={() => openLightbox(index)}
@@ -375,7 +377,7 @@ export default function PostImages({ images }: PostImagesProps) {
       }
     }
 
-    // Default to image
+    // Default to image - always use actual URL in lightbox
     return (
       <div className="flex items-center justify-center w-full h-full">
         <img

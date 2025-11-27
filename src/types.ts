@@ -35,6 +35,7 @@ export interface Comment {
 export interface PostImage {
   id: string;
   url: string;
+  thumbnail?: string;
   alt: string;
   type?: "image" | "video" | "youtube";
 }

@@ -49,6 +49,7 @@ interface PostData {
   images: Array<{
     id: string;
     url: string;
+    thumbnail?: string;
     alt: string;
     type?: "image" | "video" | "youtube";
   }>;
@@ -87,12 +88,16 @@ function App() {
         {
           id: "1",
           url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          thumbnail:
+            "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=300&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Smaller version
           alt: "Image 1",
           type: "image",
         },
         {
           id: "2",
           url: "https://plus.unsplash.com/premium_photo-1675882505334-382d4cb3d718?q=80&w=1165&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          thumbnail:
+            "https://plus.unsplash.com/premium_photo-1675882505334-382d4cb3d718?q=80&w=300&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Smaller version
           alt: "Image 2",
           type: "image",
         },
@@ -132,6 +137,8 @@ function App() {
         {
           id: "1",
           url: "https://images.unsplash.com/photo-1548347480-50e99d864837?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          thumbnail:
+            "https://images.unsplash.com/photo-1548347480-50e99d864837?q=80&w=300&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Smaller version
           alt: "Nature shot",
           type: "image",
         },
@@ -140,7 +147,7 @@ function App() {
       likeCount: 89,
       comments: [],
     },
-    // Example with video
+    // Example with video (no thumbnail needed as videos show play button overlay)
     {
       id: "3",
       author: {
@@ -156,13 +163,14 @@ function App() {
           url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Sample video URL
           alt: "Sample video",
           type: "video",
+          // Videos typically don't need separate thumbnails as they show the first frame
         },
       ],
       liked: false,
       likeCount: 45,
       comments: [],
     },
-    // Example with YouTube video
+    // Example with YouTube video (YouTube provides its own thumbnails)
     {
       id: "4",
       author: {
@@ -178,6 +186,7 @@ function App() {
           url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Example YouTube URL
           alt: "YouTube video",
           type: "youtube",
+          // YouTube iframes handle their own thumbnails
         },
       ],
       liked: false,
@@ -198,6 +207,8 @@ function App() {
         {
           id: "1",
           url: "https://images.unsplash.com/photo-1548347480-50e99d864837?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          thumbnail:
+            "https://images.unsplash.com/photo-1548347480-50e99d864837?q=80&w=300&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Smaller version
           alt: "Image",
           type: "image",
         },
@@ -216,6 +227,54 @@ function App() {
       ],
       liked: true,
       likeCount: 156,
+      comments: [],
+    },
+    // Example with very large images that would benefit from thumbnails
+    {
+      id: "6",
+      author: {
+        name: "High Resolution Photos",
+        avatar: "https://img.icons8.com/color/48/user-male-circle--v5.png",
+        timeAgo: "8h",
+      },
+      content: "High resolution landscape photography",
+      tags: ["landscape", "highres", "photography"],
+      images: [
+        {
+          id: "1",
+          url: "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=1275&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Large image
+          thumbnail:
+            "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Small thumbnail
+          alt: "Mountain landscape",
+          type: "image",
+        },
+        {
+          id: "2",
+          url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1280&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Large image
+          thumbnail:
+            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Small thumbnail
+          alt: "Forest path",
+          type: "image",
+        },
+        {
+          id: "3",
+          url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1274&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Large image
+          thumbnail:
+            "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Small thumbnail
+          alt: "Northern lights",
+          type: "image",
+        },
+        {
+          id: "4",
+          url: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=1270&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Large image
+          thumbnail:
+            "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Small thumbnail
+          alt: "Ocean waves",
+          type: "image",
+        },
+      ],
+      liked: false,
+      likeCount: 203,
       comments: [],
     },
   ]);
