@@ -8,12 +8,14 @@ interface PostHeaderProps {
   author: Author;
   options?: DropdownOption[]; // Dynamic dropdown options
   extraComponent?: ReactNode; // 👈 Allow passing a whole component
+  titleExtraComponent?: ReactNode; // 👈 NEW: Component under the title
 }
 
 export default function PostHeader({
   author,
   options = [],
   extraComponent,
+  titleExtraComponent, // 👈 NEW: Component under the title
 }: PostHeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -40,6 +42,10 @@ export default function PostHeader({
         <div>
           <h3 className="font-semibold text-gray-900 text-sm">{author.name}</h3>
           <TimeStamp time={author.timeAgo} />
+          {/* 👈 NEW: Render component under title if provided */}
+          {titleExtraComponent && (
+            <div className="mt-1">{titleExtraComponent}</div>
+          )}
         </div>
       </div>
 
