@@ -51,6 +51,7 @@ export interface PostProps {
   options?: DropdownOption[];
   images?: PostImage[];
   extraComponent?: ReactNode;
+  titleExtraComponent?: ReactNode;
   initialLiked?: boolean;
   initialLikeCount?: number;
   initialComments?: Comment[];

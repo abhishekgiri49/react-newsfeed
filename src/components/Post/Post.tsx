@@ -12,6 +12,7 @@ export default function Post({
   tags = [],
   images = [],
   extraComponent,
+  titleExtraComponent,
   options,
   initialLiked = false,
   initialLikeCount = 0,
@@ -254,6 +255,7 @@ export default function Post({
         author={author}
         options={options}
         extraComponent={extraComponent}
+        titleExtraComponent={titleExtraComponent}
       />
 
       <PostContent

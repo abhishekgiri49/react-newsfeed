@@ -455,6 +455,11 @@ function App() {
           author={post.author}
           content={post.content}
           tags={post.tags}
+          titleExtraComponent={
+            <button className="text-xs text-blue-500 hover:text-blue-600 font-medium">
+              Follow
+            </button>
+          }
           extraComponent={
             <ApplyFollowRow
               onQuickApply={async () => {
