@@ -12,20 +12,161 @@ const getYouTubeVideoId = (url: string): string | null => {
   return match && match[2].length === 11 ? match[2] : null;
 };
 
-// Helper function to get YouTube thumbnail
-const getYouTubeThumbnail = (videoId: string): string => {
-  return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-};
-
 export default function PostImages({ images }: PostImagesProps) {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Refs for intersection observer
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const youtubeRefs = useRef<Map<string, HTMLIFrameElement>>(new Map());
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
+
+  // Initialize intersection observer
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const element = entry.target;
+
+          if (element instanceof HTMLVideoElement) {
+            if (entry.isIntersecting) {
+              element.play().catch(console.error);
+            } else {
+              element.pause();
+              element.currentTime = 0; // Reset to beginning
+            }
+          }
+
+          if (
+            element instanceof HTMLIFrameElement &&
+            element.src.includes("youtube.com")
+          ) {
+            if (entry.isIntersecting) {
+              // Enable autoplay for YouTube when visible
+              const src = element.src;
+              if (src.includes("autoplay=0")) {
+                element.src = src.replace("autoplay=0", "autoplay=1");
+              }
+            } else {
+              // Disable autoplay when not visible by reloading with autoplay=0
+              const src = element.src;
+              if (src.includes("autoplay=1")) {
+                // Create a new iframe to properly stop the video
+                const parent = element.parentElement;
+                if (parent) {
+                  const newIframe = element.cloneNode(
+                    false
+                  ) as HTMLIFrameElement;
+                  newIframe.src = src.replace("autoplay=1", "autoplay=0");
+                  parent.replaceChild(newIframe, element);
+                  // Update the ref
+                  const mediaId = Array.from(
+                    youtubeRefs.current.entries()
+                  ).find(([, ref]) => ref === element)?.[0];
+                  if (mediaId) {
+                    youtubeRefs.current.set(mediaId, newIframe);
+                    // Re-observe the new iframe
+                    if (observerRef.current) {
+                      observerRef.current.observe(newIframe);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.7, // Trigger when 70% of the element is visible
+        rootMargin: "100px", // Start loading when 100px away from viewport
+      }
+    );
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, []);
+
+  // Observe grid videos and YouTube iframes when component mounts or images change
+  useEffect(() => {
+    if (!observerRef.current || isLightboxOpen) return;
+
+    // Observe all video elements in grid
+    videoRefs.current.forEach((videoElement) => {
+      observerRef.current?.observe(videoElement);
+    });
+
+    // Observe all YouTube iframes in grid
+    youtubeRefs.current.forEach((youtubeElement) => {
+      observerRef.current?.observe(youtubeElement);
+    });
+
+    return () => {
+      videoRefs.current.forEach((videoElement) => {
+        observerRef.current?.unobserve(videoElement);
+      });
+      youtubeRefs.current.forEach((youtubeElement) => {
+        observerRef.current?.unobserve(youtubeElement);
+      });
+    };
+  }, [images, isLightboxOpen]);
+
+  // Handle lightbox media observation
+  useEffect(() => {
+    if (!observerRef.current || !isLightboxOpen) return;
+
+    // Observe the current media in lightbox
+    const currentMedia = images[currentImageIndex];
+    if (currentMedia.type === "video") {
+      const videoElement = videoRefs.current.get(currentMedia.id);
+      if (videoElement) {
+        observerRef.current.observe(videoElement);
+        // Auto-play lightbox videos
+        videoElement.play().catch(console.error);
+      }
+    } else if (currentMedia.type === "youtube") {
+      const youtubeElement = youtubeRefs.current.get(currentMedia.id);
+      if (youtubeElement) {
+        observerRef.current.observe(youtubeElement);
+      }
+    }
+
+    // Cleanup when lightbox closes or media changes
+    return () => {
+      if (currentMedia.type === "video") {
+        const videoElement = videoRefs.current.get(currentMedia.id);
+        if (videoElement) {
+          observerRef.current?.unobserve(videoElement);
+          videoElement.pause();
+          videoElement.currentTime = 0;
+        }
+      } else if (currentMedia.type === "youtube") {
+        const youtubeElement = youtubeRefs.current.get(currentMedia.id);
+        if (youtubeElement) {
+          observerRef.current?.unobserve(youtubeElement);
+        }
+      }
+    };
+  }, [isLightboxOpen, currentImageIndex, images]);
+
+  // Re-observe YouTube iframes when they are rendered
+  useEffect(() => {
+    if (!observerRef.current || isLightboxOpen) return;
+
+    // Small delay to ensure iframes are rendered
+    const timeoutId = setTimeout(() => {
+      youtubeRefs.current.forEach((youtubeElement) => {
+        observerRef.current?.observe(youtubeElement);
+      });
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [images, isLightboxOpen]);
 
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);
@@ -36,6 +177,12 @@ export default function PostImages({ images }: PostImagesProps) {
   const closeLightbox = () => {
     setIsLightboxOpen(false);
     document.body.style.overflow = "unset";
+
+    // Reset all videos when lightbox closes
+    videoRefs.current.forEach((videoElement) => {
+      videoElement.pause();
+      videoElement.currentTime = 0;
+    });
   };
 
   const goToPrevious = () => {
@@ -91,8 +238,36 @@ export default function PostImages({ images }: PostImagesProps) {
   useEffect(() => {
     return () => {
       document.body.style.overflow = "unset";
+      observerRef.current?.disconnect();
     };
   }, []);
+
+  // Helper to set video ref
+  const setVideoRef = (media: PostImage, element: HTMLVideoElement | null) => {
+    if (element) {
+      videoRefs.current.set(media.id, element);
+    } else {
+      videoRefs.current.delete(media.id);
+    }
+  };
+
+  // Helper to set YouTube ref
+  const setYoutubeRef = (
+    media: PostImage,
+    element: HTMLIFrameElement | null
+  ) => {
+    if (element) {
+      youtubeRefs.current.set(media.id, element);
+      // Observe the YouTube iframe after it's rendered
+      setTimeout(() => {
+        if (observerRef.current && !isLightboxOpen) {
+          observerRef.current.observe(element);
+        }
+      }, 50);
+    } else {
+      youtubeRefs.current.delete(media.id);
+    }
+  };
 
   if (images.length === 0) return null;
 
@@ -106,15 +281,15 @@ export default function PostImages({ images }: PostImagesProps) {
 
     if (media.type === "video") {
       return (
-        <div key={media.id} className="relative">
+        <div key={media.id} className="relative w-full h-full">
           <video
+            ref={(el) => setVideoRef(media, el)}
             src={media.url || "/placeholder.svg"}
-            className={baseClassName}
+            className={`${baseClassName} object-cover`}
             onClick={() => openLightbox(index)}
-            controls
-            autoPlay
             muted
             playsInline
+            loop
           />
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="bg-black bg-opacity-60 rounded-full p-3">
@@ -139,13 +314,16 @@ export default function PostImages({ images }: PostImagesProps) {
       const videoId = getYouTubeVideoId(media.url || "");
       if (videoId) {
         return (
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&controls=1&modestbranding=1`}
-            className="w-full h-full max-w-4xl max-h-3xl"
-            style={{ aspectRatio: "16/9" }}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          <div key={media.id} className="w-full h-full relative aspect-video">
+            <iframe
+              ref={(el) => setYoutubeRef(media, el)}
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&playsinline=1&loop=1&controls=1&modestbranding=1`}
+              className="w-full h-full absolute inset-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              onClick={() => openLightbox(index)}
+            />
+          </div>
         );
       }
     }
@@ -156,7 +334,7 @@ export default function PostImages({ images }: PostImagesProps) {
         key={media.id}
         src={media.url || "/placeholder.svg"}
         alt={media.alt}
-        className={baseClassName}
+        className={`${baseClassName} object-cover`}
         onClick={() => openLightbox(index)}
       />
     );
@@ -166,12 +344,17 @@ export default function PostImages({ images }: PostImagesProps) {
   const renderLightboxContent = (media: PostImage) => {
     if (media.type === "video") {
       return (
-        <video
-          src={media.url || "/placeholder.svg"}
-          className="max-w-full max-h-full object-contain"
-          controls
-          autoPlay
-        />
+        <div className="flex items-center justify-center w-full h-full">
+          <video
+            ref={(el) => setVideoRef(media, el)}
+            src={media.url || "/placeholder.svg"}
+            className="max-w-full max-h-full object-contain"
+            controls
+            autoPlay
+            muted
+            playsInline
+          />
+        </div>
       );
     }
 
@@ -179,24 +362,28 @@ export default function PostImages({ images }: PostImagesProps) {
       const videoId = getYouTubeVideoId(media.url || "");
       if (videoId) {
         return (
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&controls=1&modestbranding=1`}
-            className="w-full h-full max-w-4xl max-h-3xl"
-            style={{ aspectRatio: "16/9" }}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          <div className="flex items-center justify-center w-full h-full">
+            <iframe
+              ref={(el) => setYoutubeRef(media, el)}
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&controls=1&modestbranding=1`}
+              className="w-full max-w-4xl h-auto aspect-video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
         );
       }
     }
 
     // Default to image
     return (
-      <img
-        src={media.url || "/placeholder.svg"}
-        alt={media.alt}
-        className="max-w-full max-h-full object-contain"
-      />
+      <div className="flex items-center justify-center w-full h-full">
+        <img
+          src={media.url || "/placeholder.svg"}
+          alt={media.alt}
+          className="max-w-full max-h-full object-contain"
+        />
+      </div>
     );
   };
 
@@ -204,7 +391,7 @@ export default function PostImages({ images }: PostImagesProps) {
     if (images.length === 1) {
       return (
         <div className="w-full">
-          {renderMediaItem(images[0], 0, "w-full h-auto object-cover")}
+          {renderMediaItem(images[0], 0, "w-full h-auto")}
         </div>
       );
     }
@@ -214,7 +401,7 @@ export default function PostImages({ images }: PostImagesProps) {
         <div className="grid grid-cols-2 gap-1">
           {images.slice(0, 2).map((media, index) => (
             <div key={media.id} className="aspect-square overflow-hidden">
-              {renderMediaItem(media, index, "w-full h-full object-cover")}
+              {renderMediaItem(media, index, "w-full h-full")}
             </div>
           ))}
         </div>
@@ -224,19 +411,16 @@ export default function PostImages({ images }: PostImagesProps) {
     if (images.length === 3) {
       return (
         <div className="grid grid-cols-2 gap-1">
+          {/* First two items in the first row */}
           <div className="aspect-square overflow-hidden">
-            {renderMediaItem(images[0], 0, "w-full h-full object-cover")}
+            {renderMediaItem(images[0], 0, "w-full h-full")}
           </div>
-          <div className="grid grid-rows-2 gap-1">
-            {images.slice(1, 3).map((media, index) => (
-              <div key={media.id} className="aspect-square overflow-hidden">
-                {renderMediaItem(
-                  media,
-                  index + 1,
-                  "w-full h-full object-cover"
-                )}
-              </div>
-            ))}
+          <div className="aspect-square overflow-hidden">
+            {renderMediaItem(images[1], 1, "w-full h-full")}
+          </div>
+          {/* Third item spans full width in second row */}
+          <div className="col-span-2 aspect-square overflow-hidden">
+            {renderMediaItem(images[2], 2, "w-full h-full")}
           </div>
         </div>
       );
@@ -253,7 +437,7 @@ export default function PostImages({ images }: PostImagesProps) {
             key={media.id}
             className="aspect-square overflow-hidden relative"
           >
-            {renderMediaItem(media, index, "w-full h-full object-cover")}
+            {renderMediaItem(media, index, "w-full h-full")}
             {index === 3 && remainingCount > 0 && (
               <div
                 className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center cursor-pointer hover:bg-opacity-50 transition-all"
@@ -321,9 +505,9 @@ export default function PostImages({ images }: PostImagesProps) {
                 <path
                   d="M15 7L10 12L15 17"
                   stroke="#000000"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </button>
@@ -346,9 +530,9 @@ export default function PostImages({ images }: PostImagesProps) {
                 <path
                   d="M10 7L15 12L10 17"
                   stroke="#000000"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </button>
@@ -356,7 +540,7 @@ export default function PostImages({ images }: PostImagesProps) {
 
           {/* Main content */}
           <div
-            className="w-full h-full flex items-center justify-center p-8"
+            className="w-full h-full flex items-center justify-center p-4"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
