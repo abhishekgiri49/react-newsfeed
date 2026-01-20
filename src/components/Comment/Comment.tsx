@@ -77,7 +77,7 @@ export default function Comment({
             />
           )}
 
-          {comment.replies.length > 0 && (
+          {comment?.replies?.length > 0 && (
             <ReplyList
               replies={comment.replies}
               showReplies={comment.showReplies}
