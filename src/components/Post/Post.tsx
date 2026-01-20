@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PostProps, Comment, Reply } from "../../types";
 import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
@@ -30,16 +30,15 @@ export default function Post({
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
-
-  const handlePostComment = () => {
+  useEffect(() => {
+    setComments(initialComments);
+  }, [initialComments]);
+  const handlePostComment = async () => {
     if (newComment.trim() && onAddComment) {
-      const comment = onAddComment(newComment);
-      if (comment) {
-        setComments([comment, ...comments]);
-        setNewComment("");
-      }
+      await onAddComment(newComment);
+      setNewComment("");
     }
   };
 
@@ -54,8 +53,8 @@ export default function Post({
                 liked: !comment.liked, // Toggle like status
                 likes: comment.liked ? comment.likes - 1 : comment.likes + 1, // Update count
               }
-            : comment
-        )
+            : comment,
+        ),
       );
 
       // Call API to update like status (if `onLikeComment` is provided)
@@ -74,8 +73,8 @@ export default function Post({
                 liked: comment.liked, // Revert like status
                 likes: comment.likes, // Revert like count
               }
-            : comment
-        )
+            : comment,
+        ),
       );
     }
   };
@@ -86,7 +85,7 @@ export default function Post({
 
       // Optimistically remove the comment
       setComments((prevComments) =>
-        prevComments.filter((comment) => comment.id !== commentId)
+        prevComments.filter((comment) => comment.id !== commentId),
       );
 
       // Call API to delete comment (if `onDeleteComment` is provided)
@@ -116,11 +115,11 @@ export default function Post({
                         liked: !reply.liked,
                         likes: reply.liked ? reply.likes - 1 : reply.likes + 1,
                       }
-                    : reply
+                    : reply,
                 ),
               }
-            : comment
-        )
+            : comment,
+        ),
       );
 
       // Call API if provided (e.g., `onLikeReply?.(commentId, replyId, !reply.liked)`)
@@ -143,11 +142,11 @@ export default function Post({
                         liked: reply.liked, // Revert
                         likes: reply.likes, // Revert
                       }
-                    : reply
+                    : reply,
                 ),
               }
-            : comment
-        )
+            : comment,
+        ),
       );
     }
   };
@@ -166,7 +165,7 @@ export default function Post({
             };
           }
           return comment;
-        })
+        }),
       );
 
       // Call API if provided
@@ -184,8 +183,8 @@ export default function Post({
                 ...comment,
                 replies: previousReplies, // restore previous replies
               }
-            : comment
-        )
+            : comment,
+        ),
       );
     }
   };
@@ -208,8 +207,8 @@ export default function Post({
                 showReplies: true,
                 showReplyInput: false,
               }
-            : comment
-        )
+            : comment,
+        ),
       );
     } catch (error) {
       // Handle any errors from onAddReply
@@ -222,8 +221,8 @@ export default function Post({
       comments.map((comment) =>
         comment.id === commentId
           ? { ...comment, showReplies: !comment.showReplies }
-          : comment
-      )
+          : comment,
+      ),
     );
   };
 
@@ -232,8 +231,8 @@ export default function Post({
       comments.map((comment) =>
         comment.id === commentId
           ? { ...comment, showReplyInput: !comment.showReplyInput }
-          : comment
-      )
+          : comment,
+      ),
     );
   };
 

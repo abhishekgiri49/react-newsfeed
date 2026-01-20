@@ -255,8 +255,8 @@ function App() {
               liked,
               likeCount: liked ? post.likeCount + 1 : post.likeCount - 1,
             }
-          : post
-      )
+          : post,
+      ),
     );
   };
 
@@ -275,7 +275,7 @@ function App() {
       showReplies: false,
       showReplyInput: false,
     };
-
+    setTimeout(() => {}, 2500);
     setPosts(
       posts.map((post) =>
         post.id === postId
@@ -283,10 +283,9 @@ function App() {
               ...post,
               comments: [newComment, ...post.comments],
             }
-          : post
-      )
+          : post,
+      ),
     );
-    return newComment;
   };
 
   const handleLikeComment = (postId: string, commentId: string) => {
@@ -304,11 +303,11 @@ function App() {
                         ? comment.likes - 1
                         : comment.likes + 1,
                     }
-                  : comment
+                  : comment,
               ),
             }
-          : post
-      )
+          : post,
+      ),
     );
   };
   const handleDeleteComment = (postId: string, commentId: string) => {
@@ -318,18 +317,18 @@ function App() {
           ? {
               ...post,
               comments: post.comments.filter(
-                (comment) => comment.id !== commentId
+                (comment) => comment.id !== commentId,
               ),
             }
-          : post
-      )
+          : post,
+      ),
     );
   };
 
   const handleAddReply = (
     postId: string,
     commentId: string,
-    content: string
+    content: string,
   ) => {
     const newReply = {
       id: `${commentId}-${Date.now()}`,
@@ -353,11 +352,11 @@ function App() {
                       ...comment,
                       replies: [...comment.replies, newReply],
                     }
-                  : comment
+                  : comment,
               ),
             }
-          : post
-      )
+          : post,
+      ),
     );
     return newReply;
   };
@@ -365,7 +364,7 @@ function App() {
   const handleLikeReply = (
     postId: string,
     commentId: string,
-    replyId: string
+    replyId: string,
   ) => {
     console.log(postId, commentId, replyId);
 
@@ -387,20 +386,20 @@ function App() {
                                 ? reply.likes - 1
                                 : reply.likes + 1,
                             }
-                          : reply
+                          : reply,
                       ),
                     }
-                  : comment
+                  : comment,
               ),
             }
-          : post
-      )
+          : post,
+      ),
     );
   };
   const handleDeleteReply = (
     postId: string,
     commentId: string,
-    replyId: string
+    replyId: string,
   ) => {
     setPosts(
       posts.map((post) =>
@@ -412,14 +411,14 @@ function App() {
                   ? {
                       ...comment,
                       replies: comment.replies.filter(
-                        (reply) => reply.id !== replyId
+                        (reply) => reply.id !== replyId,
                       ),
                     }
-                  : comment
+                  : comment,
               ),
             }
-          : post
-      )
+          : post,
+      ),
     );
   };
 
@@ -442,7 +441,7 @@ function App() {
         // Fallback for browsers without Share API
         console.log("Shared post:", postId);
         alert(
-          `Sharing: "${postToShare.content}" by ${postToShare.author.name}`
+          `Sharing: "${postToShare.content}" by ${postToShare.author.name}`,
         );
       }
     }
